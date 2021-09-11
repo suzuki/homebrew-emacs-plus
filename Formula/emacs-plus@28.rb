@@ -26,6 +26,7 @@ class EmacsPlusAT28 < EmacsBase
   option "with-xwidgets", "Experimental: build with xwidgets support"
   option "with-no-frame-refocus", "Disables frame re-focus (ie. closing one frame does not refocus another one)"
   option "with-native-comp", "Build with native compilation"
+  option "with-ns-inline-patch", "Build with ns-inline-patch"
 
   #
   # Dependencies
@@ -94,6 +95,13 @@ class EmacsPlusAT28 < EmacsBase
   def initialize(name, path, spec, alias_path: nil, force_bottle: false)
     super
     expand_path
+  end
+
+  if build.with? "ns-inline-patch"
+    patch :p1 do
+      url "https://raw.githubusercontent.com/takaxp/ns-inline-patch/bc02513c61f2f0981eeb95599731a956323e8bb9/emacs-head-inline.patch"
+      sha256 "6dc552cfba4e315beb04b9a7921d4dedd41427079b31f7a6474246268c93a4ed"
+    end
   end
 
   #
