@@ -104,6 +104,13 @@ class EmacsPlusAT28 < EmacsBase
     end
   end
 
+  if build.with? "ns-inline-patch"
+    patch :p1 do
+      url "https://raw.githubusercontent.com/takaxp/ns-inline-patch/bc02513c61f2f0981eeb95599731a956323e8bb9/emacs-head-inline.patch"
+      sha256 "6dc552cfba4e315beb04b9a7921d4dedd41427079b31f7a6474246268c93a4ed"
+    end
+  end
+
   #
   # Install
   #
