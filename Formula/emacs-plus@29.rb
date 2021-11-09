@@ -1,8 +1,8 @@
 require_relative "../Library/EmacsBase"
 
-class EmacsPlusAT28 < EmacsBase
-  init 28
-  version "28.0.50"
+class EmacsPlusAT29 < EmacsBase
+  init 29
+  version "29.0.50"
 
   #
   # Options
@@ -19,7 +19,6 @@ class EmacsPlusAT28 < EmacsBase
   option "with-xwidgets", "Experimental: build with xwidgets support"
   option "with-no-frame-refocus", "Disables frame re-focus (ie. closing one frame does not refocus another one)"
   option "with-native-comp", "Build with native compilation"
-  option "with-ns-inline-patch", "Build with ns-inline-patch"
 
   #
   # Dependencies
@@ -65,7 +64,7 @@ class EmacsPlusAT28 < EmacsBase
   # URL
   #
 
-  url "https://github.com/emacs-mirror/emacs.git", :branch => "emacs-28"
+  url "https://github.com/emacs-mirror/emacs.git", :branch => "master"
 
   #
   # Icons
@@ -81,14 +80,7 @@ class EmacsPlusAT28 < EmacsBase
   local_patch "no-frame-refocus-cocoa", sha: "fb5777dc890aa07349f143ae65c2bcf43edad6febfd564b01a2235c5a15fcabd" if build.with? "no-frame-refocus"
   local_patch "fix-window-role", sha: "1f8423ea7e6e66c9ac6dd8e37b119972daa1264de00172a24a79a710efcb8130"
   local_patch "system-appearance", sha: "d6ee159839b38b6af539d7b9bdff231263e451c1fd42eec0d125318c9db8cd92"
-  local_patch "posix-spawn", sha: "70cf278fc51fff0e104b58d26af5c6361e4c989d50e09922d8eec54e654ceef4"
-
-  if build.with? "ns-inline-patch"
-    patch :p1 do
-      url "https://raw.githubusercontent.com/takaxp/ns-inline-patch/bc02513c61f2f0981eeb95599731a956323e8bb9/emacs-head-inline.patch"
-      sha256 "6dc552cfba4e315beb04b9a7921d4dedd41427079b31f7a6474246268c93a4ed"
-    end
-  end
+  local_patch "posix-spawn", sha: "07044965ca094a84170cc23a273d9b2592da37c4dba6ea0f55dbfb4cf3a8d107"
 
   #
   # Install
