@@ -96,15 +96,8 @@ class EmacsPlusAT29 < EmacsBase
 
   if build.with? "ns-inline-patch"
     patch :p1 do
-      url "https://raw.githubusercontent.com/takaxp/ns-inline-patch/f3e1ab212cd9cf7980c12da66a8d9a0351ee3098/emacs-head-inline.patch"
-      sha256 "c7ef519c05ba860976597a4c7777cae7835f8249f0b0cb2047b5e4cf85de6829"
-    end
-  end
-
-  if build.with? "ns-inline-patch"
-    patch :p1 do
-      url "https://raw.githubusercontent.com/takaxp/ns-inline-patch/8a4e03950117e2a6656da9ebb17496d430ab267d/emacs-head-inline.patch"
-      sha256 "e7116aec3fc52ded31b6ec4342529743b3c2c5623e3bade94d40851252125f8c"
+      url "https://raw.githubusercontent.com/takaxp/ns-inline-patch/f18dd65f3821f474e4d65ec359dd3fabaa883301/emacs-head-inline.patch"
+      sha256 "d0a8a9700f21bf4c8eabccac74cbe054fb8cff25c90ecc87c2f6ccd8f7ec25cf"
     end
   end
 
