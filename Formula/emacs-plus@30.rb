@@ -90,6 +90,7 @@ class EmacsPlusAT30 < EmacsBase
   local_patch "system-appearance", sha: "d6ee159839b38b6af539d7b9bdff231263e451c1fd42eec0d125318c9db8cd92"
   local_patch "poll", sha: "052eacac5b7bd86b466f9a3d18bff9357f2b97517f463a09e4c51255bdb14648" if build.with? "poll"
   local_patch "round-undecorated-frame", sha: "7451f80f559840e54e6a052e55d1100778abc55f98f1d0c038a24e25773f2874"
+  local_patch "emacs-head-inline", sha: "4bfd488402ca3d998d4d45c671481c66685c17dfb4b5a58ec35648ee37d27a24"
 
   #
   # Initialize
