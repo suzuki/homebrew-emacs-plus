@@ -30,6 +30,7 @@ class EmacsPlusAT30 < EmacsBase
   depends_on "autoconf" => :build
   depends_on "gnu-sed" => :build
   depends_on "gnu-tar" => :build
+  depends_on "grep" => :build
   depends_on "awk" => :build
   depends_on "coreutils" => :build
   depends_on "pkg-config" => :build
@@ -39,6 +40,7 @@ class EmacsPlusAT30 < EmacsBase
   depends_on "librsvg"
   depends_on "little-cms2"
   depends_on "jansson"
+  depends_on "tree-sitter"
   depends_on "imagemagick" => :optional
   depends_on "dbus" => :optional
   depends_on "mailutils" => :optional
@@ -87,16 +89,20 @@ class EmacsPlusAT30 < EmacsBase
   local_patch "fix-window-role", sha: "1f8423ea7e6e66c9ac6dd8e37b119972daa1264de00172a24a79a710efcb8130"
   local_patch "system-appearance", sha: "d6ee159839b38b6af539d7b9bdff231263e451c1fd42eec0d125318c9db8cd92"
   local_patch "poll", sha: "052eacac5b7bd86b466f9a3d18bff9357f2b97517f463a09e4c51255bdb14648" if build.with? "poll"
-  local_patch "round-undecorated-frame", sha: "0e5ac1ccabb66a374fc9e8f2fb2d6e591d4c211b4aa912be280e68a846063184"
+  local_patch "round-undecorated-frame", sha: "7451f80f559840e54e6a052e55d1100778abc55f98f1d0c038a24e25773f2874"
   local_patch "emacs-head-inline", sha: "4bfd488402ca3d998d4d45c671481c66685c17dfb4b5a58ec35648ee37d27a24"
 
   #
   # Initialize
   #
 
-  def initialize(name, path, spec, alias_path: nil, force_bottle: false)
-    super
+  # Save the existing method.
+  alias :initialize_old :initialize
+
+  def initialize(*args, &block)
+    a = initialize_old(*args, &block)
     expand_path
+    a
   end
 
   #
@@ -122,6 +128,10 @@ class EmacsPlusAT30 < EmacsBase
 
     ENV.append "CFLAGS", "-g -Og" if build.with? "debug"
     ENV.append "CFLAGS", "-DFD_SETSIZE=10000 -DDARWIN_UNLIMITED_SELECT"
+
+    # Necessary for libgccjit library discovery
+    ENV.append "CPATH", "#{HOMEBREW_PREFIX}/include" if build.with? "native-comp"
+    ENV.append "LIBRARY_PATH", "#{HOMEBREW_PREFIX}/lib/gcc/current" if build.with? "native-comp"
 
     args <<
       if build.with? "dbus"
@@ -152,6 +162,8 @@ class EmacsPlusAT30 < EmacsBase
     args << "--with-xwidgets" if build.with? "xwidgets"
 
     ENV.prepend_path "PATH", Formula["gnu-sed"].opt_libexec/"gnubin"
+    ENV.prepend_path "PATH", Formula["gnu-tar"].opt_libexec/"gnubin"
+    ENV.prepend_path "PATH", Formula["grep"].opt_libexec/"gnubin"
     system "./autogen.sh"
 
     if (build.with? "cocoa") && (build.without? "x11")
@@ -247,6 +259,13 @@ class EmacsPlusAT30 < EmacsBase
     args << "--with-poll" if build.with? "poll"
   end
 
+  def post_install
+    emacs_info_dir = info/"emacs"
+    Dir.glob(emacs_info_dir/"*.info") do |info_filename|
+      system "install-info", "--info-dir=#{emacs_info_dir}", info_filename
+    end
+  end
+
   def caveats
     <<~EOS
       Emacs.app was installed to:
@@ -261,30 +280,11 @@ class EmacsPlusAT30 < EmacsBase
     EOS
   end
 
-  plist_options :manual => "emacs"
-
-  def plist
-    <<~EOS
-      <?xml version="1.0" encoding="UTF-8"?>
-      <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-      <plist version="1.0">
-      <dict>
-        <key>Label</key>
-        <string>#{plist_name}</string>
-        <key>ProgramArguments</key>
-        <array>
-          <string>#{opt_bin}/emacs</string>
-          <string>--fg-daemon</string>
-        </array>
-        <key>RunAtLoad</key>
-        <true/>
-        <key>StandardOutPath</key>
-        <string>/tmp/homebrew.mxcl.emacs-plus.stdout.log</string>
-        <key>StandardErrorPath</key>
-        <string>/tmp/homebrew.mxcl.emacs-plus.stderr.log</string>
-      </dict>
-      </plist>
-    EOS
+  service do
+    run [opt_bin/"emacs", "--fg-daemon"]
+    keep_alive true
+    log_path "/tmp/homebrew.mxcl.emacs-plus.stdout.log"
+    error_log_path "/tmp/homebrew.mxcl.emacs-plus.stderr.log"
   end
 
   test do
